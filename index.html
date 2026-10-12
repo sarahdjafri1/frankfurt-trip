@@ -181,6 +181,8 @@ a{color:inherit}
 .mapctl button svg{width:20px;height:20px}
 .maperr{position:absolute;left:12px;right:64px;bottom:12px;z-index:500;background:var(--glass-hi);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-radius:16px;padding:10px 12px;font-size:13px;box-shadow:0 4px 14px rgb(0 0 0 / .15)}
 .leaflet-container{font-family:var(--f-body);background:transparent}
+.tiles-light{filter:saturate(.7) brightness(1.03)}
+.tiles-dark{filter:invert(1) hue-rotate(185deg) brightness(.85) contrast(.9) saturate(.6)}
 .leaflet-bar{border:0!important;border-radius:16px!important;overflow:hidden;box-shadow:0 4px 14px rgb(0 0 0 / .15)!important}
 .leaflet-control-zoom a{background:var(--glass-hi)!important;color:var(--ink)!important;border-color:var(--line)!important;width:40px!important;height:40px!important;line-height:40px!important}
 .leaflet-control-attribution{background:color-mix(in srgb,var(--glass-hi) 85%,transparent)!important;color:var(--muted)!important;font-size:10px!important;border-radius:10px 0 0 0}
@@ -259,7 +261,7 @@ a{color:inherit}
     </div>
     <div class="ticket glass">
       <div class="trow"><span class="tchip">Home base</span><span class="tchip ok">Booked</span></div>
-      <div><h3>Adina Apartment Hotel Westend</h3><div class="addr">Osloer Straße 3, Europaviertel · 5 min walk to the Hauptbahnhof</div></div>
+      <div><h3>Adina Apartment Hotel Westend</h3><div class="addr">Osloer Straße 3, next to Skyline Plaza · 10 min walk to the Hauptbahnhof</div></div>
       <div class="tflight">
         <div><div class="tsmall">Tue 13 Oct</div><div class="tbig">15:00</div><div class="tsmall">Check-in</div></div>
         <div class="tmid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/></svg><div class="tsmall">2 nights</div></div>
@@ -306,7 +308,7 @@ a{color:inherit}
     <div class="sect"><h2>Before we go</h2><p id="packcount"></p></div>
     <div class="card glass"><ul class="check" id="pack"></ul></div>
     <div class="know">
-      <div class="glass k1"><b>Museum embankment</b>The Städel (Schaumainkai 63) and Museum Angewandte Kunst (Schaumainkai 17) are on the same riverside street, about 10 minutes apart. From the Adina, the Städel is about 20 minutes on foot over the Holbeinsteg footbridge.</div>
+      <div class="glass k1"><b>Museum embankment</b>The Städel (Schaumainkai 63) and Museum Angewandte Kunst (Schaumainkai 17) are on the same riverside street, about 10 minutes apart. From the Adina, the Städel is about 25 minutes on foot over the Holbeinsteg footbridge.</div>
       <div class="glass k2"><b>Ordering vegan and gluten free</b>Chipotle: a bowl with rice, beans, fajita veggies, salsa and guac, no tortilla, cheese or sour cream. Im Herzen Afrikas: vegan platter with the corn injera. Olimpio: vegan spaghetti ice in a cup, no wafer.</div>
       <div class="glass k3"><b>Getting around</b>Any S-Bahn from the Hauptbahnhof goes to Hauptwache and Konstablerwache in a few minutes, handy for Chipotle, Pilates and Olimpio. Buy RMV tickets in the app.</div>
     </div>
@@ -326,7 +328,7 @@ a{color:inherit}
 <script>
 const KEY='ffm-trip-v1';
 const DATA_VER=8;
-const HOTEL={id:'hotel',name:'Adina Apartment Hotel Westend',short:'Adina (home)',lat:50.1078,lng:8.6575,q:'Adina Apartment Hotel Frankfurt Westend, Osloer Straße 3, 60327 Frankfurt',meta:'Home base · Osloer Straße 3',text:'Check-in 15:00, check-out 11:00. Full kitchen, gym and sauna on the 10th floor. About 5 minutes on foot to the Hauptbahnhof.'};
+const HOTEL={id:'hotel',name:'Adina Apartment Hotel Westend',short:'Adina (home)',lat:50.10909,lng:8.65442,q:'Adina Apartment Hotel Frankfurt Westend, Osloer Straße 3, 60327 Frankfurt',meta:'Home base · Osloer Straße 3',text:'Check-in 15:00, check-out 11:00. Full kitchen, gym and sauna on the 10th floor. About 10 minutes on foot to the Hauptbahnhof, 2 minutes to Skyline Plaza.'};
 const maps=q=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function walkMin(a,b){
@@ -338,21 +340,21 @@ const fromHome=p=>{const m=walkMin(HOTEL,p);return m>25?m+' min walk from the Ad
 
 /* cat: plan | food | meet. q is the exact search used for Maps and directions */
 const PLACES=[
- {id:'pilates',cat:'plan',name:'the pilates studio',short:'Pilates',lat:50.1147,lng:8.6852,q:'the pilates studio, Brönnerstraße 22, 60313 Frankfurt',meta:'Your plans · Brönnerstraße 22, Innenstadt',text:'Wednesday morning Pilates through Urban Sports Club while Simon is at his meeting. Book the class in the app.'},
- {id:'staedel',cat:'plan',name:'Städel Museum',short:'Städel',lat:50.1032,lng:8.6741,q:'Städel Museum, Schaumainkai 63, Frankfurt',meta:'Your plans · Schaumainkai 63',text:'Thursday 10:00. Impressionists in the 19th century rooms. Open until 21:00 on Thursdays.'},
- {id:'mak',cat:'plan',name:'Museum Angewandte Kunst',short:'Angewandte Kunst',lat:50.1060,lng:8.6842,q:'Museum Angewandte Kunst, Schaumainkai 17, Frankfurt',meta:'Your plans · Schaumainkai 17',text:"Wednesday 14:30, Simon's pick. Design and fashion in a Richard Meier building. Open until 20:00 on Wednesdays."},
- {id:'dfg',cat:'plan',name:'DFG Restaurant & Bar',short:'DFG drinks',lat:50.1153,lng:8.6736,q:'DFG Restaurant & Bar, Neue Rothofstraße 21, Frankfurt',meta:'Maybe · Neue Rothofstraße 21',text:'An after-dinner drink on Wednesday. Cocktail bar and lounge, open from 18:00 Tue to Thu. Ask which drinks are vegan.'},
- {id:'dfb',cat:'meet',name:'DFB Campus',short:'DFB Campus',lat:50.0836,lng:8.6452,q:'DFB Campus, Kennedyallee 274, Frankfurt',meta:"Simon's meeting · Niederrad",text:'Wednesday 10:00. Allow about 30 minutes from the Adina by tram or taxi.'},
- {id:'chip1',cat:'food',plan:true,name:'Chipotle MyZeil',short:'Chipotle',lat:50.1142,lng:8.6808,q:'Chipotle MyZeil, Zeil 106, Frankfurt',meta:'Your pick · Zeil',text:'Tuesday 19:00. Order a bowl: rice, beans, fajita veggies, salsa, guac. No tortilla, cheese or sour cream.',tier:'pick',kind:'Mexican fast casual',area:'MyZeil mall, Zeil',order:'A bowl with rice, beans, fajita veggies, salsa and guac. Ask if sofritas are available.',hours:'Mon to Sat until 21:00, Sun until 19:00'},
- {id:'olimpio',cat:'food',plan:true,name:'Eis Café Olimpio',short:'Olimpio',lat:50.1232,lng:8.6826,q:'Eis Café Olimpio, Oeder Weg 58, 60318 Frankfurt',meta:'Your pick · Oeder Weg 58, Nordend',text:'Vegan spaghetti ice for dessert on Tuesday. Ask for it in a cup with no wafer.',tier:'pick',kind:'Ice cream café',area:'Oeder Weg 58, Nordend',order:'The <b>vegan spaghetti ice</b>. Ask for it in a cup with no wafer or cookie on top, and check the sauce and topping are gluten free.',hours:'Tue to Sat 10:30 to 22:30, Mon 12:30 to 21:00'},
- {id:'afrikas',cat:'food',plan:true,name:'Im Herzen Afrikas',short:'Herzen Afrikas',lat:50.1063,lng:8.6746,q:'Im Herzen Afrikas, Gutleutstraße 13, Frankfurt',href:'https://maps.app.goo.gl/MKgxeAQBkcHGzsmUA?g_st=ic',meta:'Must · Gutleutstraße 13',text:'Wednesday 19:00 dinner. Vegan platter with gluten-free corn injera. Reserve ahead and bring cash.',tier:'pick',kind:'Eritrean and East African',area:'Gutleutstraße 13, near the Hauptbahnhof',order:'The <b>vegan platter</b> with <b>gluten-free corn injera</b>. Ask for it specifically, since regular injera may contain wheat. Not all desserts are vegan.',hours:'Tue to Fri from 18:00. Reserve: +49 69 24246080. Cash, maybe debit.'},
- {id:'chip2',cat:'food',name:'Chipotle Skyline Plaza',short:'Chipotle 2',lat:50.1087,lng:8.6531,q:'Chipotle Skyline Plaza, Europa-Allee 6, Frankfurt',meta:'Your pick · Europaviertel',text:'The second Chipotle, right by the hotel. Same bowl order.',tier:'pick',kind:'Mexican fast casual',area:'Skyline Plaza mall, Europa-Allee 6',order:'Same bowl order as MyZeil.',hours:''},
- {id:'lua',cat:'food',name:'Lúa Cuisine',short:'Lúa',lat:50.1005,lng:8.6797,q:'Lúa Cuisine, Schweizer Straße 75, Frankfurt',href:'https://lua-cuisine.de',meta:'Vegan + GF · Sachsenhausen',text:'Vietnamese with a 100% gluten-free kitchen. Fresh tofu summer rolls and rice noodle salads.',tier:'gf',kind:'Vietnamese, 100% gluten-free kitchen',area:'Schweizer Straße 75, Sachsenhausen',order:'<b>Gỏi Cuốn Chay</b> (fresh tofu summer rolls), <b>Bún Đậu Hủ</b> (rice noodle salad with tofu), clay-pot tofu. Confirm no egg or butter.',hours:'Closed Mon. Tue to Fri 11:30 to 14:30 and 17:00 to 22:30.'},
- {id:'plants',cat:'food',name:'Plants & Cakes',short:'Plants & Cakes',lat:50.1240,lng:8.6765,q:'Plants & Cakes, Grüneburgweg 35, Frankfurt',meta:'Vegan + GF · Westend',text:'Fully vegan raw cakery and juice bar. Cakes are gluten free and sugar free.',tier:'both',kind:'Raw cakery and juice bar, fully vegan',area:'Grüneburgweg 35, Westend',order:'Raw cakes, juices, lunch bowls. Ask which lunch dishes are gluten free.',hours:'Daily 10:00 to 17:00 (2023 listing)'},
- {id:'isabella',cat:'food',name:'Isabella Glutenfreie Pâtisserie',short:'Isabella',lat:50.1112,lng:8.6820,q:'Isabella Glutenfreie Pâtisserie, Frankfurt',meta:'Vegan + GF · Altstadt',text:'A fully gluten-free bakery with vegan pastries and a vegan praline counter.',tier:'gf',kind:'Bakery, 100% gluten free',area:'Altstadt, by the Römer',order:'The vegan pastries and the vegan praline counter.',hours:'Mon to Sat 9:30 to 18:00 (2022 listing). Address listed as Neue Kräme 29 or Sandgasse 6, so check the map.'},
- {id:'alex',cat:'food',name:'Glutenfreie Kaffeebar by Alex',short:'Kaffeebar Alex',lat:50.1131,lng:8.6990,q:'Glutenfreie Kaffeebar by Alex, Hanauer Landstraße 50, Frankfurt',meta:'Vegan + GF · Ostend',text:'Fully gluten-free coffee bar with vegan options.',tier:'gf',kind:'Coffee bar and bakery, 100% gluten free',area:'Hanauer Landstraße 50, Ostend',order:'Breakfast, brunch or lunch. Ask which items are vegan.',hours:''},
- {id:'swans',cat:'food',name:'Seven Swans',short:'Seven Swans',lat:50.1092,lng:8.6866,q:'Seven Swans, Mainkai 4, Frankfurt',meta:'Vegan · Altstadt riverside',text:'Michelin-starred, fully vegan tasting menu. Ask for gluten free when you book.',tier:'vegan',kind:'Fully vegan tasting menu, Michelin star',area:'Mainkai 4, on the river',order:'The set vegan menu, gluten free on request.',hours:'Reservation needed'},
- {id:'dominion',cat:'food',name:'Dominion Food Revolution',short:'Dominion',lat:50.1243,lng:8.6746,q:'Dominion Food Revolution, Grüneburgweg 41, Frankfurt',meta:'Vegan · Westend',text:'Vegan burgers, with gluten-free buns according to one listing.',tier:'vegan',kind:'Vegan burgers',area:'Grüneburgweg 41, Westend',order:'A burger on a gluten-free bun. Ask first, that detail is unverified.',hours:''}
+ {id:'pilates',cat:'plan',name:'the pilates studio',short:'Pilates',lat:50.11682,lng:8.68299,q:'the pilates studio, Brönnerstraße 22, 60313 Frankfurt',meta:'Your plans · Brönnerstraße 22, Innenstadt',text:'Wednesday morning Pilates through Urban Sports Club while Simon is at his meeting. Book the class in the app.'},
+ {id:'staedel',cat:'plan',name:'Städel Museum',short:'Städel',lat:50.10322,lng:8.67382,q:'Städel Museum, Schaumainkai 63, Frankfurt',meta:'Your plans · Schaumainkai 63',text:'Thursday 10:00. Impressionists in the 19th century rooms. Open until 21:00 on Thursdays.'},
+ {id:'mak',cat:'plan',name:'Museum Angewandte Kunst',short:'Angewandte Kunst',lat:50.10627,lng:8.68095,q:'Museum Angewandte Kunst, Schaumainkai 17, Frankfurt',meta:'Your plans · Schaumainkai 17',text:"Wednesday 14:30, Simon's pick. Design and fashion in a Richard Meier building. Open until 20:00 on Wednesdays."},
+ {id:'dfg',cat:'plan',name:'DFG Restaurant & Bar',short:'DFG drinks',lat:50.11378,lng:8.67368,q:'DFG Restaurant & Bar, Neue Rothofstraße 21, Frankfurt',meta:'Maybe · Neue Rothofstraße 21',text:'An after-dinner drink on Wednesday. Cocktail bar and lounge, open from 18:00 Tue to Thu. Ask which drinks are vegan.'},
+ {id:'dfb',cat:'meet',name:'DFB Campus',short:'DFB Campus',lat:50.0832,lng:8.65437,q:'DFB Campus, Kennedyallee 274, Frankfurt',meta:"Simon's meeting · Niederrad",text:'Wednesday 10:00. Allow about 30 minutes from the Adina by tram or taxi.'},
+ {id:'chip1',cat:'food',plan:true,name:'Chipotle MyZeil',short:'Chipotle',lat:50.11486,lng:8.68154,q:'Chipotle MyZeil, Zeil 106, Frankfurt',meta:'Your pick · Zeil',text:'Tuesday 19:00. Order a bowl: rice, beans, fajita veggies, salsa, guac. No tortilla, cheese or sour cream.',tier:'pick',kind:'Mexican fast casual',area:'MyZeil mall, Zeil',order:'A bowl with rice, beans, fajita veggies, salsa and guac. Ask if sofritas are available.',hours:'Mon to Sat until 21:00, Sun until 19:00'},
+ {id:'olimpio',cat:'food',plan:true,name:'Eis Café Olimpio',short:'Olimpio',lat:50.12203,lng:8.681,q:'Eis Café Olimpio, Oeder Weg 58, 60318 Frankfurt',meta:'Your pick · Oeder Weg 58, Nordend',text:'Vegan spaghetti ice for dessert on Tuesday. Ask for it in a cup with no wafer.',tier:'pick',kind:'Ice cream café',area:'Oeder Weg 58, Nordend',order:'The <b>vegan spaghetti ice</b>. Ask for it in a cup with no wafer or cookie on top, and check the sauce and topping are gluten free.',hours:'Tue to Sat 10:30 to 22:30, Mon 12:30 to 21:00'},
+ {id:'afrikas',cat:'food',plan:true,name:'Im Herzen Afrikas',short:'Herzen Afrikas',lat:50.1074,lng:8.67159,q:'Im Herzen Afrikas, Gutleutstraße 13, Frankfurt',href:'https://maps.app.goo.gl/MKgxeAQBkcHGzsmUA?g_st=ic',meta:'Must · Gutleutstraße 13',text:'Wednesday 19:00 dinner. Vegan platter with gluten-free corn injera. Reserve ahead and bring cash.',tier:'pick',kind:'Eritrean and East African',area:'Gutleutstraße 13, near the Hauptbahnhof',order:'The <b>vegan platter</b> with <b>gluten-free corn injera</b>. Ask for it specifically, since regular injera may contain wheat. Not all desserts are vegan.',hours:'Tue to Fri from 18:00. Reserve: +49 69 24246080. Cash, maybe debit.'},
+ {id:'chip2',cat:'food',name:'Chipotle Skyline Plaza',short:'Chipotle 2',lat:50.10938,lng:8.65273,q:'Chipotle Skyline Plaza, Europa-Allee 6, Frankfurt',meta:'Your pick · Europaviertel',text:'The second Chipotle, right by the hotel. Same bowl order.',tier:'pick',kind:'Mexican fast casual',area:'Skyline Plaza mall, Europa-Allee 6',order:'Same bowl order as MyZeil.',hours:''},
+ {id:'lua',cat:'food',name:'Lúa Cuisine',short:'Lúa',lat:50.10037,lng:8.68223,q:'Lúa Cuisine, Schweizer Straße 75, Frankfurt',href:'https://lua-cuisine.de',meta:'Vegan + GF · Sachsenhausen',text:'Vietnamese with a 100% gluten-free kitchen. Fresh tofu summer rolls and rice noodle salads.',tier:'gf',kind:'Vietnamese, 100% gluten-free kitchen',area:'Schweizer Straße 75, Sachsenhausen',order:'<b>Gỏi Cuốn Chay</b> (fresh tofu summer rolls), <b>Bún Đậu Hủ</b> (rice noodle salad with tofu), clay-pot tofu. Confirm no egg or butter.',hours:'Closed Mon. Tue to Fri 11:30 to 14:30 and 17:00 to 22:30.'},
+ {id:'plants',cat:'food',name:'Plants & Cakes',short:'Plants & Cakes',lat:50.12105,lng:8.67157,q:'Plants & Cakes, Grüneburgweg 35, Frankfurt',meta:'Vegan + GF · Westend',text:'Fully vegan raw cakery and juice bar. Cakes are gluten free and sugar free.',tier:'both',kind:'Raw cakery and juice bar, fully vegan',area:'Grüneburgweg 35, Westend',order:'Raw cakes, juices, lunch bowls. Ask which lunch dishes are gluten free.',hours:'Daily 10:00 to 17:00 (2023 listing)'},
+ {id:'isabella',cat:'food',name:'Isabella Glutenfreie Pâtisserie',short:'Isabella',lat:50.11237,lng:8.68116,q:'Isabella Glutenfreie Pâtisserie, Frankfurt',meta:'Vegan + GF · Altstadt',text:'A fully gluten-free bakery with vegan pastries and a vegan praline counter.',tier:'gf',kind:'Bakery, 100% gluten free',area:'Altstadt, by the Römer',order:'The vegan pastries and the vegan praline counter.',hours:'Mon to Sat 9:30 to 18:00 (2022 listing). Address listed as Neue Kräme 29 or Sandgasse 6, so check the map.'},
+ {id:'alex',cat:'food',name:'Glutenfreie Kaffeebar by Alex',short:'Kaffeebar Alex',lat:50.11266,lng:8.70139,q:'Glutenfreie Kaffeebar by Alex, Hanauer Landstraße 50, Frankfurt',meta:'Vegan + GF · Ostend',text:'Fully gluten-free coffee bar with vegan options.',tier:'gf',kind:'Coffee bar and bakery, 100% gluten free',area:'Hanauer Landstraße 50, Ostend',order:'Breakfast, brunch or lunch. Ask which items are vegan.',hours:''},
+ {id:'swans',cat:'food',name:'Seven Swans',short:'Seven Swans',lat:50.10966,lng:8.68679,q:'Seven Swans, Mainkai 4, Frankfurt',meta:'Vegan · Altstadt riverside',text:'Michelin-starred, fully vegan tasting menu. Ask for gluten free when you book.',tier:'vegan',kind:'Fully vegan tasting menu, Michelin star',area:'Mainkai 4, on the river',order:'The set vegan menu, gluten free on request.',hours:'Reservation needed'},
+ {id:'dominion',cat:'food',name:'Dominion Food Revolution',short:'Dominion',lat:50.12126,lng:8.67095,q:'Dominion Food Revolution, Grüneburgweg 41, Frankfurt',meta:'Vegan · Westend',text:'Vegan burgers, with gluten-free buns according to one listing.',tier:'vegan',kind:'Vegan burgers',area:'Grüneburgweg 41, Westend',order:'A burger on a gluten-free bun. Ask first, that detail is unverified.',hours:''}
 ];
 const P=id=>id==='hotel'?HOTEL:PLACES.find(x=>x.id===id);
 
@@ -372,9 +374,9 @@ const DEFAULT_DAYS=[
  ]},
  {id:'thu',label:'Thu 15 Oct',title:'Impressionists, then home',items:[
   {t:'09:30',title:'Pack up and leave bags at the Adina',place:'hotel',note:'Check-out is 11:00. Ask the front desk to hold luggage.',tags:[]},
-  {t:'10:00',title:'Städel Museum',place:'staedel',note:'Impressionists in the 19th century collection, plus "Mary Magdalene". About €18. 20 minutes on foot from the hotel over the Holbeinsteg.',link:'https://www.staedelmuseum.de/en',linkLabel:'Tickets',tags:['Must','Museum']},
-  {t:'13:30',title:'Lunch, maybe Chipotle round two',place:'chip2',note:'Skyline Plaza is right next to the hotel, handy before you grab your bags.',tags:['Optional']},
-  {t:'15:30',title:'Head home',place:'hotel',note:'Pick up bags, then 5 minutes to the Hauptbahnhof.',tags:[]}
+  {t:'10:00',title:'Städel Museum',place:'staedel',note:'Impressionists in the 19th century collection, plus "Mary Magdalene". About €18. About 25 minutes on foot from the hotel over the Holbeinsteg, or take the tram.',link:'https://www.staedelmuseum.de/en',linkLabel:'Tickets',tags:['Must','Museum']},
+  {t:'13:30',title:'Lunch, maybe Chipotle round two',place:'chip2',note:'Skyline Plaza is a 2 minute walk from the hotel, handy before you grab your bags.',tags:['Optional']},
+  {t:'15:30',title:'Head home',place:'hotel',note:'Pick up bags, then about 10 minutes on foot to the Hauptbahnhof.',tags:[]}
  ]}
 ];
 
@@ -496,7 +498,7 @@ const dark=()=>{const t=document.documentElement.getAttribute('data-theme');retu
 function setTiles(){
   if(!map)return;
   if(tiles)map.removeLayer(tiles);
-  tiles=L.tileLayer('https://{s}.basemaps.cartocdn.com/'+(dark()?'dark_all':'rastertiles/voyager')+'/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>'});
+  tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,className:dark()?'tiles-dark':'tiles-light',attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
   tiles.on('tileerror',()=>{tileErrs++;checkTiles();});
   tiles.on('tileload',()=>{tileOk++;document.getElementById('maperr').hidden=true;});
   tiles.addTo(map);
@@ -578,13 +580,15 @@ function renderSheet(){
   const c=document.getElementById('sClose');if(c)c.onclick=()=>{state.pin=null;save();drawMap(false);renderSheet();};
 }
 function initMap(){
-  if(map){map.invalidateSize();drawMap(true);renderSheet();return;}
+  if(map){map.invalidateSize();drawMap(true);renderSheet();setTimeout(()=>map.invalidateSize(),300);return;}
   if(typeof L==='undefined'){const e=document.getElementById('maperr');e.hidden=false;e.textContent='The map could not load. Check your connection and reopen the app.';renderSheet();return;}
   map=L.map('map',{zoomControl:true,attributionControl:true,tap:true}).setView([HOTEL.lat,HOTEL.lng],14);
   map.zoomControl.setPosition('bottomright');
   setTiles();
   map.on('click',()=>{if(state.pin){state.pin=null;save();drawMap(false);renderSheet();}});
   drawMap(true);renderSheet();
+  setTimeout(()=>{map.invalidateSize();drawMap(true);},350);
+  window.addEventListener('resize',()=>map&&map.invalidateSize());
   try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{setTiles();drawMap(false);});}catch(e){}
 }
 document.querySelectorAll('#filters .pill').forEach(b=>b.onclick=()=>{state.filter=b.dataset.f;
@@ -622,7 +626,7 @@ function setTab(t){
   document.querySelectorAll('.tabp').forEach(s=>{s.hidden=s.id!=='tab-'+t;});
   document.querySelectorAll('.nav button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===t)));
   window.scrollTo(0,0);
-  if(t==='map')requestAnimationFrame(initMap);
+  if(t==='map')setTimeout(initMap,30);
 }
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 document.getElementById('toPlan').onclick=()=>setTab('plan');
