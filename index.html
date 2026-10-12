@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Frankfurt Trip</title>
+<meta name="theme-color" content="#efe9df" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151912" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Frankfurt">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap">
+<style>
+html{padding-top:env(safe-area-inset-top,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+/* Layout: one phone-style app column, summary card, colored day blocks, bottom tab bar (Plan / Eat / Hotel / Map / Pack) */
+:root{
+  --bg:#efe9df; --card:#fbf8f3; --ink:#232a1f; --muted:#6e6a60; --line:#ddd5c8;
+  --forest:#26331f; --on-forest:#fbf8f3;
+  --orange:#df7a4c; --olive:#5d6a39; --pink:#e7b5c8; --lav:#8f96e6; --lav-soft:#bcc1f4; --sky:#a9d3cf;
+  --on-day:#fffaf4; --on-pink:#3a2430;
+  --water:#a9d3cf; --land:#f6f1e8; --street:#e4dccd; --park:#cfe3c4;
+  --good:#3f7a4a; --warn:#b4581f; --fixed:#a63d2e;
+  --f-display:"Playfair Display",Georgia,"Times New Roman",serif;
+  --f-body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#151912; --card:#1f241b; --ink:#efe9df; --muted:#a8a395; --line:#33392c;
+  --forest:#e9e3d6; --on-forest:#1a1e16;
+  --orange:#c46a40; --olive:#5a6838; --pink:#b98398; --lav:#8a90d8; --lav-soft:#5d63a8; --sky:#4f8580;
+  --on-day:#fff6ec; --on-pink:#fff1f6;
+  --water:#2f5551; --land:#1c2118; --street:#2b3125; --park:#2a3a24;
+  --good:#8fcb98; --warn:#eba06f; --fixed:#ee8d7d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151912; --card:#1f241b; --ink:#efe9df; --muted:#a8a395; --line:#33392c;
+  --forest:#e9e3d6; --on-forest:#1a1e16;
+  --orange:#c46a40; --olive:#5a6838; --pink:#b98398; --lav:#8a90d8; --lav-soft:#5d63a8; --sky:#4f8580;
+  --on-day:#fff6ec; --on-pink:#fff1f6;
+  --water:#2f5551; --land:#1c2118; --street:#2b3125; --park:#2a3a24;
+  --good:#8fcb98; --warn:#eba06f; --fixed:#ee8d7d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.app{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:20px calc(110px + env(safe-area-inset-bottom,0px));display:grid;gap:22px}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;margin:0;text-wrap:balance;letter-spacing:-.01em}
+button,input{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+.tabp{display:grid;gap:16px}
+
+/* header */
+.top{display:flex;justify-content:space-between;align-items:center}
+.date{font-size:14px;color:var(--muted)}
+.pair{display:flex}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:13px;border:2px solid var(--bg)}
+.av.a{background:var(--pink);color:var(--on-pink)}
+.av.b{background:var(--olive);color:var(--on-day);margin-left:-10px}
+.hero h1{font-size:clamp(36px,10vw,50px);line-height:1}
+.hero p{margin:8px 0 0;color:var(--muted);max-width:42ch}
+.summary{display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:14px;align-items:center;background:var(--card);border:0;border-radius:20px;padding:14px 14px 14px 18px;text-align:left;cursor:pointer;box-shadow:0 1px 0 var(--line),0 8px 24px rgb(0 0 0 / .05)}
+.summary h3{font-size:21px;line-height:1.15}
+.sum-text{display:grid;gap:8px;min-width:0}
+.sum-meta{display:flex;gap:12px;font-size:13px;color:var(--muted)}
+.sum-tags{display:flex;gap:6px;flex-wrap:wrap}
+.sum-tags span{font-size:12px;font-weight:500;padding:3px 9px;border-radius:99px;background:var(--bg);border:1px solid var(--line)}
+.sum-map{width:140px;height:auto;max-width:100%}
+@media (prefers-reduced-motion:no-preference){.summary{transition:transform .2s}.summary:hover{transform:translateY(-2px)}}
+@media (max-width:360px){.summary{grid-template-columns:1fr}.sum-map{width:100%}}
+.pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.pill{flex:none;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;font-size:14px;cursor:pointer;white-space:nowrap}
+.pill b{font-weight:600}
+.pill.on{background:var(--forest);color:var(--on-forest);border-color:var(--forest)}
+.pill small{opacity:.7;margin-left:4px}
+
+/* day blocks */
+.day{border-radius:18px;padding:16px;display:grid;grid-template-columns:96px minmax(0,1fr);gap:4px 14px;color:var(--on-day);scroll-margin-top:16px}
+.day.c1{background:var(--orange)}.day.c2{background:var(--olive)}.day.c3{background:var(--pink);color:var(--on-pink)}
+.dhead h2{font-size:30px;line-height:1}
+.dhead .sub{font-size:13px;opacity:.85;margin-top:6px}
+.dlist{list-style:none;margin:0;padding:0;min-width:0}
+.it{border-bottom:1px solid color-mix(in srgb,currentColor 28%,transparent);padding-block:10px}
+.it:first-child{padding-top:2px}
+.it:last-child{border-bottom:0}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center}
+.row .main{cursor:pointer;min-width:0;background:none;border:0;padding:0;text-align:left;color:inherit}
+.tm{font-size:12px;opacity:.8;font-variant-numeric:tabular-nums}
+.tt{font-family:var(--f-display);font-weight:600;font-size:16.5px;line-height:1.2}
+.it.done .tt{text-decoration:line-through;opacity:.6}
+.circ{width:28px;height:28px;border-radius:50%;border:1.5px solid currentColor;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer;opacity:.85;padding:0}
+.circ svg{width:14px;height:14px}
+.it.done .ck{background:currentColor}
+.it.done .ck svg{stroke:var(--orange)}
+.c2 .it.done .ck svg{stroke:var(--olive)}.c3 .it.done .ck svg{stroke:var(--pink)}
+.it.open .chev svg{transform:rotate(90deg)}
+.more{font-size:13.5px;opacity:.92;margin-top:8px;display:grid;gap:8px}
+.more a{font-weight:600}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;border:1px solid currentColor;opacity:.9}
+.tag.solid{background:var(--on-day);color:var(--ink);border-color:transparent}
+.fixedbadge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--on-day);color:var(--fixed);padding:1px 7px;border-radius:99px;margin-left:6px;vertical-align:2px}
+.rm{justify-self:start;background:none;border:0;padding:0;font-size:12.5px;text-decoration:underline;cursor:pointer;color:inherit;opacity:.8}
+.addf{grid-column:1/-1;display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:6px;margin-top:8px}
+.addf input{border:1px solid color-mix(in srgb,currentColor 35%,transparent);background:color-mix(in srgb,var(--card) 18%,transparent);color:inherit;border-radius:99px;padding:7px 12px;min-width:0}
+.addf input::placeholder{color:inherit;opacity:.7}
+.addf button{border:0;border-radius:99px;background:var(--on-day);color:var(--ink);padding:7px 14px;font-weight:600;cursor:pointer}
+@media (max-width:380px){.day{grid-template-columns:1fr}.dhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.dhead .sub{margin:0}}
+
+/* generic card + buttons */
+.card{background:var(--card);border-radius:20px;padding:16px;display:grid;gap:12px;box-shadow:0 1px 0 var(--line)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border-radius:99px;padding:11px 14px;text-align:center;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;border:1.5px solid var(--forest);background:transparent;color:var(--forest)}
+.btn.fill{background:var(--forest);color:var(--on-forest)}
+.sect h2{font-size:28px}
+.sect p{margin:4px 0 0;color:var(--muted)}
+.sub-h{font-family:var(--f-display);font-size:19px;font-weight:600;margin:6px 0 -4px}
+.chip{font-size:12.5px;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap}
+.chip.ok{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.chip.over{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.none{background:var(--bg);color:var(--muted)}
+.hint{font-size:12.5px;color:var(--muted)}
+.crit{display:flex;flex-wrap:wrap;gap:6px}
+.crit span{font-size:12.5px;border:1px solid var(--line);border-radius:99px;padding:4px 10px;background:var(--card)}
+
+/* walk table */
+.walk{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.walk div{background:var(--bg);border-radius:12px;padding:7px 6px;text-align:center;min-width:0}
+.walk b{display:block;font-size:16px;font-variant-numeric:tabular-nums}
+.walk span{font-size:11px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:380px){.walk{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* hotels */
+.hband{border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:end;gap:10px;min-height:84px;color:var(--on-day)}
+.hband.v0{background:var(--olive)}.hband.v1{background:var(--orange)}.hband.v2{background:var(--lav-soft);color:var(--ink)}.hband.v3{background:var(--pink);color:var(--on-pink)}.hband.v4{background:var(--sky);color:var(--ink)}
+.hband .area{font-size:12.5px;font-weight:600;background:color-mix(in srgb,var(--card) 85%,transparent);color:var(--ink);padding:4px 10px;border-radius:99px}
+.hband .st{font-size:13px;letter-spacing:2px}
+.hotel.chosen{outline:2px solid var(--forest);outline-offset:-2px}
+.hotel h3{font-size:20px}
+.hotel ul{margin:0;padding-left:18px;color:var(--muted);font-size:14px}
+.fit{justify-self:start;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--forest);color:var(--on-forest);padding:3px 10px;border-radius:99px}
+.price{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.price label{font-size:13px;color:var(--muted)}
+.price input{width:96px;border:1px solid var(--line);background:var(--bg);border-radius:99px;padding:7px 12px}
+.sortrow{display:flex;gap:8px;flex-wrap:wrap}
+
+/* eat */
+.eat .eh{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.eat h3{font-size:20px}
+.eat .kind{font-size:13px;color:var(--muted)}
+.eat .order{font-size:14px}
+.eat .order b{font-weight:600}
+.tier{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.tier.both{background:var(--olive);color:var(--on-day)}
+.tier.gf{background:color-mix(in srgb,var(--olive) 18%,transparent);color:var(--olive)}
+.tier.vegan{background:color-mix(in srgb,var(--orange) 18%,transparent);color:var(--warn)}
+.tier.pick{background:var(--pink);color:var(--on-pink)}
+.addday{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.addday button{border:1px solid var(--line);background:var(--bg);border-radius:99px;padding:5px 11px;font-size:13px;font-weight:600;cursor:pointer}
+.addday button.added{background:var(--forest);color:var(--on-forest);border-color:var(--forest)}
+
+/* map */
+.seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.mapwrap{position:relative;border-radius:22px;overflow:hidden;background:var(--land);border:1px solid var(--line)}
+.mapwrap svg{display:block;width:100%;height:auto}
+.mk{cursor:pointer}
+.mk circle.dot{stroke:var(--card);stroke-width:2.2}
+.mk text{font-family:var(--f-body);font-size:9px;font-weight:600;fill:var(--ink);paint-order:stroke;stroke:var(--land);stroke-width:3px}
+.mk.sel circle.dot{stroke:var(--forest);stroke-width:3}
+.mk.dim{opacity:.25}
+.pop{margin:-40px 12px 0;position:relative}
+.pop h3{font-size:19px}
+.pop .meta{font-size:13px;color:var(--muted)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+
+/* pack */
+.check{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.check label{display:flex;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.check li:last-child label{border-bottom:0}
+.check input{appearance:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--forest);flex:none;display:grid;place-items:center;margin:0;cursor:pointer}
+.check input:checked{background:var(--forest)}
+.check input:checked::after{content:"";width:6px;height:10px;border:solid var(--on-forest);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.check input:checked + span{text-decoration:line-through;color:var(--muted)}
+.know{display:grid;gap:10px}
+.know div{border-radius:14px;padding:12px 14px;font-size:14px}
+.know .k1{background:color-mix(in srgb,var(--olive) 16%,transparent)}
+.know .k2{background:color-mix(in srgb,var(--orange) 16%,transparent)}
+.know .k3{background:color-mix(in srgb,var(--pink) 30%,transparent)}
+.know b{font-family:var(--f-display);font-size:16px;display:block;margin-bottom:2px}
+.foot{font-size:12px;color:var(--muted);text-align:center}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 70%,transparent);z-index:10}
+.nav div{max-width:460px;margin:0 auto;background:var(--card);border-radius:99px;display:grid;grid-template-columns:repeat(5,1fr);padding:5px;box-shadow:0 6px 24px rgb(0 0 0 / .12),0 0 0 1px var(--line)}
+.nav button{border:0;background:transparent;border-radius:99px;padding:8px 2px;display:grid;justify-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer}
+.nav button svg{width:20px;height:20px}
+.nav button[aria-selected="true"]{background:var(--forest);color:var(--on-forest)}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="top">
+    <div class="date" id="today">Your trip</div>
+    <div class="pair" aria-label="You and Simon"><span class="av a">You</span><span class="av b">S</span></div>
+  </div>
+
+  <!-- PLAN -->
+  <section id="tab-plan" class="tabp">
+    <div class="hero">
+      <h1>Frankfurt,<br>13 to 15 Oct</h1>
+      <p id="sub">Two nights, three days, one very important burrito bowl.</p>
+    </div>
+    <button class="summary" type="button" id="toMap" aria-label="Open the map">
+      <div class="sum-text">
+        <h3>3 days in Frankfurt</h3>
+        <div class="sum-meta"><span>2 nights</span><span>Vegan + GF</span></div>
+        <div class="sum-tags"><span>Museums</span><span>Lagree</span><span>Chipotle</span></div>
+      </div>
+      <svg class="sum-map" viewBox="0 0 140 110" aria-hidden="true">
+        <rect width="140" height="110" rx="14" fill="var(--land)"/>
+        <g stroke="var(--street)" stroke-width="3" fill="none" stroke-linecap="round"><path d="M0 34 C40 30 90 33 140 28"/><path d="M30 0 L48 60"/><path d="M95 0 L88 60"/><path d="M0 90 C50 86 90 92 140 84"/></g>
+        <path d="M-5 66 C30 54 60 74 90 64 S125 52 145 58" stroke="var(--water)" stroke-width="11" fill="none"/>
+        <path d="M84 36 L44 80 L82 76 L28 40" stroke="var(--forest)" stroke-width="1.6" stroke-dasharray="3 3" fill="none"/>
+        <g font-family="var(--f-body)" font-size="8" font-weight="700" text-anchor="middle">
+          <circle cx="84" cy="36" r="8" fill="var(--orange)" stroke="var(--card)" stroke-width="2"/><text x="84" y="39" fill="var(--on-day)">1</text>
+          <circle cx="82" cy="76" r="8" fill="var(--olive)" stroke="var(--card)" stroke-width="2"/><text x="82" y="79" fill="var(--on-day)">2</text>
+          <circle cx="44" cy="80" r="8" fill="var(--pink)" stroke="var(--card)" stroke-width="2"/><text x="44" y="83" fill="var(--on-pink)">3</text>
+          <circle cx="28" cy="40" r="8" fill="var(--lav-soft)" stroke="var(--card)" stroke-width="2"/><text x="28" y="43" fill="var(--ink)">4</text>
+        </g>
+      </svg>
+    </button>
+    <div class="pills" id="daypills"></div>
+    <div id="days" style="display:grid;gap:14px"></div>
+  </section>
+
+  <!-- EAT -->
+  <section id="tab-eat" class="tabp" hidden>
+    <div class="sect"><h2>Vegan and gluten free</h2><p>Only places with food you can both eat. Dedicated gluten-free kitchens are listed first because they are the safest bet.</p></div>
+    <div id="eat" style="display:grid;gap:14px"></div>
+    <p class="hint">Hours come from the most recent listing I could find. Check before you go, and say you need vegan and gluten free when you order.</p>
+  </section>
+
+  <!-- HOTEL -->
+  <section id="tab-hotel" class="tabp" hidden>
+    <div class="sect"><h2>Where we'll sleep</h2><p>Walking times are measured to your plans: Chipotle, Sculpture (twice), and both museums. Type the nightly rate you see for 13 to 15 Oct to check it against your budget.</p></div>
+    <div class="crit"><span>4 or 5 stars</span><span>Under €140 a night</span><span>10 min walk is fine</span><span>Not near DFB Campus</span></div>
+    <div class="sortrow" role="group" aria-label="Sort hotels">
+      <button class="pill on" type="button" data-sort="fit">Closest to plans</button>
+      <button class="pill" type="button" data-sort="price">Cheapest first</button>
+    </div>
+    <div id="hotels" style="display:grid;gap:14px"></div>
+  </section>
+
+  <!-- MAP -->
+  <section id="tab-map" class="tabp" hidden>
+    <div class="sect"><h2>Getting around</h2><p>Drawn to scale from real locations. Tap any pin.</p></div>
+    <div class="seg" id="filters" role="group" aria-label="Filter the map">
+      <button class="pill on" type="button" data-f="all">Everything</button>
+      <button class="pill" type="button" data-f="plan">Our plans</button>
+      <button class="pill" type="button" data-f="food">Vegan + GF</button>
+      <button class="pill" type="button" data-f="hotel">Hotels</button>
+    </div>
+    <div class="mapwrap">
+      <svg viewBox="0 0 360 390" role="img" aria-label="Map of central Frankfurt with trip places, hotels and food">
+        <rect width="360" height="390" fill="var(--land)"/>
+        <path d="M0 318 C80 300 160 312 360 330 L360 390 L0 390Z" fill="var(--park)"/>
+        <ellipse cx="122" cy="24" rx="30" ry="16" fill="var(--park)"/>
+        <g stroke="var(--street)" stroke-width="5" fill="none" stroke-linecap="round">
+          <path d="M190 110 L238 106"/><path d="M112 161 L182 121"/><path d="M262 113 L360 108"/>
+          <path d="M0 150 L62 153"/><path d="M184 182 L200 240"/><path d="M160 95 L96 66"/>
+          <path d="M211 72 L216 0"/><path d="M172 182 C130 240 70 300 28 350"/><path d="M196 114 L176 30"/>
+          <path d="M246 160 L280 260"/>
+        </g>
+        <path d="M167 178 C150 140 160 105 185 82 S240 68 258 100 S266 142 256 156" stroke="var(--park)" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <path d="M0 264 L55 245 L95 214 L122 191 L172 177 L207 157 L245 157 L277 162 L302 169 L360 183" stroke="var(--water)" stroke-width="13" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+        <text x="318" y="194" font-family="var(--f-display)" font-style="italic" font-size="13" fill="var(--ink)" opacity=".55">Main</text>
+        <rect x="108" y="157" width="9" height="9" rx="2" fill="var(--muted)" opacity=".7"/>
+        <text x="104" y="155" text-anchor="end" font-family="var(--f-body)" font-size="8.5" font-weight="600" fill="var(--muted)">Hbf</text>
+        <text x="80" y="110" font-family="var(--f-body)" font-size="8.5" fill="var(--muted)" font-style="italic">Westend</text>
+        <text x="300" y="98" font-family="var(--f-body)" font-size="8.5" fill="var(--muted)" font-style="italic">Ostend</text>
+        <text x="150" y="250" font-family="var(--f-body)" font-size="8.5" fill="var(--muted)" font-style="italic">Sachsenhausen</text>
+        <circle cx="28" cy="350" r="26" fill="none" stroke="var(--fixed)" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <text x="58" y="378" font-family="var(--f-body)" font-size="8.5" fill="var(--fixed)" font-weight="600">Niederrad: don't stay here</text>
+        <g id="pins"></g>
+      </svg>
+    </div>
+    <div class="card pop" id="pop"></div>
+    <div class="legend"><span><i style="background:var(--olive)"></i>Our plans</span><span><i style="background:var(--orange)"></i>Vegan + GF food</span><span><i style="background:var(--lav)"></i>Hotels</span><span><i style="background:var(--fixed)"></i>Simon's meeting</span></div>
+  </section>
+
+  <!-- PACK -->
+  <section id="tab-pack" class="tabp" hidden>
+    <div class="sect"><h2>Before we go</h2><p id="packcount"></p></div>
+    <div class="card"><ul class="check" id="pack"></ul></div>
+    <div class="know">
+      <div class="k1"><b>Museum embankment</b>The Städel (Schaumainkai 63) and Museum Angewandte Kunst (Schaumainkai 17) are on the same riverside street, about 10 minutes apart. U1, U2, U3 or U8 to Schweizer Platz. Both are closed Mondays.</div>
+      <div class="k2"><b>Chipotle</b>Germany's only Chipotles are both in Frankfurt: MyZeil mall on the Zeil (until 21:00 Mon to Sat) and Skyline Plaza by the Messe. For vegan and gluten free, order a bowl: rice, beans, fajita veggies, salsa, guac. The flour tortilla has gluten, and cheese and sour cream aren't vegan.</div>
+      <div class="k3"><b>Lagree at Sculpture</b>Horst-Schulmann-Straße 3, next to the European Central Bank in the Ostend. 50 minute reformer classes, open weekdays 06:00 to 19:20. From the Adina it's a long walk, so take any S-Bahn from the Hauptbahnhof to Ostendstraße. Bring grip socks and arrive 10 to 15 minutes early for your first class.</div>
+    </div>
+    <div class="btns"><button class="btn" id="reset" type="button">Reset the plan</button><button class="btn fill" id="toPlan" type="button">Back to plan</button></div>
+    <p class="foot" id="resetMsg">Checkmarks, edits and prices save in this browser only. Simon sees the original plan if you share the link.</p>
+  </section>
+</div>
+
+<nav class="nav" aria-label="Sections"><div role="tablist">
+  <button role="tab" data-tab="plan" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Plan</button>
+  <button role="tab" data-tab="eat" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M6 12c0 4 2.7 7 6 7s6-3 6-7"/><path d="M12 12c0-3 1.5-5.5 4-7M12 12c-1-2-3-3.5-5-4"/></svg>Eat</button>
+  <button role="tab" data-tab="hotel" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18V8M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></svg>Hotel</button>
+  <button role="tab" data-tab="map" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>Map</button>
+  <button role="tab" data-tab="pack" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M9 12l2 2 4-4"/></svg>Pack</button>
+</div></nav>
+
+<script>
+const KEY='ffm-trip-v1';
+const DATA_VER=7;
+const maps=q=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+const book=q=>'https://www.booking.com/searchresults.html?ss='+encodeURIComponent(q)+'&checkin=2026-10-13&checkout=2026-10-15&group_adults=2&no_rooms=1';
+const A=(href,txt)=>'<a href="'+href+'" target="_blank" rel="noopener">'+txt+'</a>';
+const SCULPT='Sculpture, Horst-Schulmann-Straße 3, next to the European Central Bank. From the Adina, walk to the Hauptbahnhof and take any S-Bahn east to Ostendstraße, then walk a few minutes. Allow about 25 minutes door to door. '+A(maps('Sculpture Horst-Schulmann-Straße 3 Frankfurt'),'Map');
+
+const DEFAULT_DAYS=[
+ {id:'tue',label:'Tue 13 Oct',title:'Arrive and eat Chipotle',sub:'Check in, first Lagree, Chipotle',items:[
+  {t:'15:00',title:'Check in at the Adina Westend',note:'Osloer Straße 3, about 5 minutes on foot from the Hauptbahnhof. Check-in opens at 15:00. Every room has a kitchen, so grab breakfast groceries on the way. '+A(maps('Adina Apartment Hotel Frankfurt Westend Osloer Straße 3'),'Map'),tags:['Hotel']},
+  {t:'17:00',title:'Lagree at Sculpture, class 1 of 2',note:'First class from the 2-for-1 pack. '+SCULPT+' Open weekdays until 19:20, so book a 17:00 slot.',tags:['Lagree']},
+  {t:'19:00',title:'Chipotle at MyZeil',note:'Zeil shopping centre, Foodtopia food court. Open until 21:00. Vegan and gluten free: get a bowl (the flour tortilla has gluten) with rice, beans, fajita veggies, salsa and guac. Skip cheese and sour cream, and ask if sofritas are on the menu. '+A(maps('Chipotle MyZeil Frankfurt'),'Map'),tags:['Must']}
+ ]},
+ {id:'wed',label:'Wed 14 Oct',title:"Simon's meeting day",sub:'No museums before lunch',items:[
+  {t:'10:00',title:'Simon: meeting at DFB Campus',note:'Kennedyallee in Niederrad, south of the river. Leave about 30 minutes to get there from the centre.',tags:['Fixed'],fixed:true},
+  {t:'10:00',title:'You: Lagree at Sculpture, class 2 of 2',note:'Uses the second class from the pack while Simon is at his meeting. '+SCULPT,tags:['Lagree']},
+  {t:'12:30',title:'Smoothies and rice paper rolls',note:'Your saved lunch spot. '+A('https://maps.app.goo.gl/8DV4cYfpSB4jt9NR6?g_st=ic','Open in Maps'),tags:['Food']},
+  {t:'14:30',title:'Museum Angewandte Kunst',note:"Simon's pick. Design and fashion in a Richard Meier building around Villa Metzler. About €12, 1 to 1.5 hours. Open until 20:00 on Wednesdays. "+A('https://maps.app.goo.gl/iSKrikyra3XQYHdf7?g_st=ic','Open in Maps'),tags:['Museum']},
+  {t:'19:00',title:'Dinner at Im Herzen Afrikas',note:'Eritrean and East African, Gutleutstraße 13, about 15 to 20 minutes on foot from the Adina, or 12 minutes over the river from the Museum Angewandte Kunst. Order the vegan platter and ask for the gluten-free corn injera (the regular injera may contain wheat). Opens 18:00, gets busy, so reserve: +49 69 24246080. Bring cash. '+A('https://maps.app.goo.gl/MKgxeAQBkcHGzsmUA?g_st=ic','Open in Maps'),tags:['Food','Book ahead']}
+ ]},
+ {id:'thu',label:'Thu 15 Oct',title:'Impressionists, then home',sub:'Städel, lunch, check out',items:[
+  {t:'09:30',title:'Check out, leave bags at the Adina',note:'Check-out is 11:00, so you could also drop bags later. Ask the front desk to hold luggage until you head to the station.',tags:[]},
+  {t:'10:00',title:'Städel Museum',note:'Impressionists in the 19th century collection, plus "Mary Magdalene" (until 17 Jan 2027). About €18. Open until 21:00 on Thursdays if you travel late. '+A('https://www.staedelmuseum.de/en','Tickets')+' · '+A(maps('Städel Museum Frankfurt'),'Map'),tags:['Must','Museum']},
+  {t:'13:30',title:'Lunch, maybe Chipotle round two',note:'The Skyline Plaza branch is by the Messe, west of the centre. Same order: a bowl, no tortilla, no cheese or sour cream.',tags:['Optional']},
+  {t:'15:30',title:'Head home',note:'',tags:[]}
+ ]}
+];
+
+/* Places with real coordinates. cat: plan | food | meet */
+const PLACES=[
+ {id:'sculpture',cat:'plan',name:'Sculpture (Lagree)',short:'Sculpture',lat:50.1095,lng:8.7035,meta:'Your plans · Ostend, by the ECB',text:'Lagree class 1 on Tuesday 17:00 and class 2 on Wednesday 10:00. Horst-Schulmann-Straße 3.',q:'Sculpture Horst-Schulmann-Straße 3 Frankfurt'},
+ {id:'staedel',cat:'plan',name:'Städel Museum',short:'Städel',lat:50.1029,lng:8.6738,meta:'Your plans · Schaumainkai 63',text:'Thursday 10:00. Impressionists in the 19th century rooms. Open until 21:00 on Thursdays.',q:'Städel Museum Frankfurt'},
+ {id:'mak',cat:'plan',name:'Museum Angewandte Kunst',short:'Angewandte Kunst',lat:50.1058,lng:8.6835,meta:'Your plans · Schaumainkai 17',text:"Wednesday 14:30, Simon's pick. About 10 min walk east of the Städel.",href:'https://maps.app.goo.gl/iSKrikyra3XQYHdf7?g_st=ic'},
+ {id:'dfb',cat:'meet',name:'DFB Campus',short:'DFB Campus',lat:50.0830,lng:8.6455,meta:"Simon's meeting · Niederrad",text:'Wednesday 10:00. Allow about 30 minutes from the centre. Not where you want to stay.',q:'DFB Campus Frankfurt',xy:[28,350]},
+ {id:'chip1',cat:'food',plan:true,name:'Chipotle MyZeil',short:'Chipotle',lat:50.1142,lng:8.6795,meta:'Your pick · Zeil',text:'Tuesday 19:00. Order a bowl: rice, beans, fajita veggies, salsa, guac. No tortilla, cheese or sour cream.',q:'Chipotle MyZeil Frankfurt',tier:'pick',kind:'Mexican fast casual',area:'Zeil, in the MyZeil mall',order:'A bowl with rice, beans, fajita veggies, salsa and guac. Ask if sofritas are available.',hours:'Mon to Sat until 21:00, Sun until 19:00'},
+ {id:'chip2',cat:'food',name:'Chipotle Skyline Plaza',short:'Chipotle 2',lat:50.1085,lng:8.6530,meta:'Your pick · Europaviertel',text:'The second Chipotle, if Thursday calls for round two.',q:'Chipotle Skyline Plaza Frankfurt',xy:[60,156],tier:'pick',kind:'Mexican fast casual',area:'Skyline Plaza mall, by the Messe',order:'Same bowl order as MyZeil.',hours:''},
+ {id:'afrikas',cat:'food',plan:true,name:'Im Herzen Afrikas',short:'Herzen Afrikas',lat:50.1062,lng:8.6735,meta:'Your pick · Gutleutstraße 13',text:'Wednesday 19:00 dinner. Vegan platter with gluten-free corn injera. Reserve ahead and bring cash.',href:'https://maps.app.goo.gl/MKgxeAQBkcHGzsmUA?g_st=ic',tier:'pick',kind:'Eritrean and East African',area:'Gutleutstraße 13, near the Hauptbahnhof',order:'The <b>vegan platter</b> (about half the menu is marked vegan) with <b>gluten-free corn injera</b>. Ask for it specifically, since regular injera may contain wheat. Check dessert, not all are vegan.',hours:'Tue to Fri 18:00 to 01:00. Reserve on +49 69 24246080. Cash, maybe debit, no credit cards.'},
+ {id:'lua',cat:'food',name:'Lúa Cuisine',short:'Lúa',lat:50.1005,lng:8.6797,meta:'Vegan + GF · Sachsenhausen',text:'Vietnamese, and the whole kitchen is gluten free. Tofu summer rolls and rice noodle salads. About 10 min from the museums.',href:'https://lua-cuisine.de',tier:'gf',kind:'Vietnamese, 100% gluten-free kitchen',area:'Schweizer Straße 75, Sachsenhausen',order:'<b>Gỏi Cuốn Chay</b> (fresh tofu summer rolls), <b>Bún Đậu Hủ</b> (rice noodle salad with tofu), clay-pot tofu. These sit under a vegetarian and vegan heading, so confirm no egg or butter.',hours:'Closed Mon. Tue to Fri 11:30 to 14:30 and 17:00 to 22:30. Weekends 12:00 to 22:30.',near:'About 10 minutes on foot from either museum, an easy Wednesday or Thursday lunch.'},
+ {id:'plants',cat:'food',name:'Plants & Cakes',short:'Plants & Cakes',lat:50.1240,lng:8.6745,meta:'Vegan + GF · Westend',text:'Fully vegan raw cakery and juice bar. Cakes are gluten free and sugar free, plus salads and bowls at lunch.',q:'Plants & Cakes Grüneburgweg 35 Frankfurt',xy:[178,34],tier:'both',kind:'Raw cakery and juice bar, fully vegan',area:'Grüneburgweg 35, Westend',order:'Raw cakes (gluten free and sugar free), juices, lunch salads, stews and bowls. Ask which lunch dishes are gluten free.',hours:'Daily 10:00 to 17:00 (2023 listing)'},
+ {id:'isabella',cat:'food',name:'Isabella Glutenfreie Pâtisserie',short:'Isabella',lat:50.1115,lng:8.6815,meta:'Vegan + GF · Altstadt',text:'A fully gluten-free bakery with vegan pastries and a vegan praline counter.',q:'Isabella Glutenfreie Patisserie Frankfurt',tier:'gf',kind:'Bakery, 100% gluten free',area:'Altstadt, by the Römer and Hauptwache',order:'The vegan pastries and the vegan praline counter.',hours:'Mon to Sat 9:30 to 18:00, Sun 10:00 to 18:00 (2022 listing)',near:'Listed at Neue Kräme 29 in 2022. A newer listing gives Sandgasse 6, a few streets away, so check the map pin before you go.'},
+ {id:'alex',cat:'food',name:'Glutenfreie Kaffeebar by Alex',short:'Kaffeebar Alex',lat:50.1135,lng:8.6985,meta:'Vegan + GF · Ostend',text:'Fully gluten-free coffee bar with vegan options. A few minutes from Sculpture.',q:'Glutenfreie Kaffeebar by Alex Hanauer Landstraße 50 Frankfurt',tier:'gf',kind:'Coffee bar and bakery, 100% gluten free',area:'Hanauer Landstraße 50, Ostend',order:'Breakfast, brunch or lunch. Ask which items are vegan.',hours:'',near:'About 10 minutes on foot from Sculpture, so it works right after a Lagree class.'},
+ {id:'swans',cat:'food',name:'Seven Swans',short:'Seven Swans',lat:50.1092,lng:8.6862,meta:'Vegan · Altstadt riverside',text:'Michelin-starred, fully vegan tasting menu. Tell them you need gluten free when you book.',q:'Seven Swans Mainkai 4 Frankfurt',xy:[231,141],tier:'vegan',kind:'Fully vegan tasting menu, Michelin star',area:'Mainkai 4, on the river by the Alte Brücke',order:'The set vegan menu. Ask for it gluten free when you reserve.',hours:'Reservation needed'},
+ {id:'dominion',cat:'food',name:'Dominion Food Revolution',short:'Dominion',lat:50.1243,lng:8.6735,meta:'Vegan · Westend',text:'Vegan burgers, with gluten-free buns according to one listing. Ask to be sure.',q:'Dominion Food Revolution Grüneburgweg 41 Frankfurt',xy:[160,24],tier:'vegan',kind:'Vegan burgers',area:'Grüneburgweg 41, Westend',order:'A burger on a gluten-free bun. That bun comes from an unverified listing, so ask first.',hours:''}
+];
+
+const HOTELS=[
+ {id:'adina',name:'Adina Apartment Hotel Frankfurt Westend',stars:4,area:'Europaviertel, by Hbf',lat:50.1075,lng:8.6590,xy:[94,170],pros:['Full kitchen in every room, so easy vegan and gluten-free breakfasts','10th floor gym and sauna','About 5 min walk to the Hauptbahnhof for going home'],hint:'Osloer Straße 3. Check-in 15:00, check-out 11:00. Breakfast is €25 each, so the kitchen saves money too.'},
+ {id:'avani',name:'Avani Frankfurt City Hotel',stars:4.5,area:'Konstablerwache',lat:50.1155,lng:8.6862,xy:[226,91],pros:['Right by the Zeil','A few tram stops from Sculpture'],hint:'Formerly NH Collection Frankfurt City.'},
+ {id:'westin',name:'The Westin Grand Frankfurt',stars:5,area:'Konstablerwache',lat:50.1155,lng:8.6876,xy:[243,100],pros:['Pool and spa','Same easy walk to the Zeil'],hint:'Seen from about €128 on Trip.com, dates unknown.'},
+ {id:'hilton',name:'Hilton Frankfurt City Centre',stars:4,area:'Hochstraße',lat:50.1167,lng:8.6745,pros:['Indoor pool','Near Alte Oper and Hauptwache'],hint:'Seen from about €119 to €139 on Trip.com, dates unknown.'},
+ {id:'meridien',name:'Le Méridien Frankfurt',stars:5,area:'Near Hauptbahnhof',lat:50.1060,lng:8.6655,pros:['Cross the river and you are at the Städel','Close to the train station for going home'],hint:'Seen from about €78 on Trip.com, dates unknown.'},
+ {id:'flemings',name:'Flemings Selection Hotel Frankfurt-City',stars:4,area:'Eschenheimer Tor',lat:50.1185,lng:8.6823,pros:['Rooftop restaurant','Short walk to Hauptwache and the Zeil'],hint:''},
+ {id:'mercure',name:'Mercure Hotel Kaiserhof Frankfurt City Center',stars:4,area:'Kaiserstraße',lat:50.1078,lng:8.6680,pros:['Central for everything','The station blocks nearby get rough at night'],hint:''},
+ {id:'melia',name:'Meliá Frankfurt City',stars:4,area:'Europaviertel',lat:50.1095,lng:8.6545,xy:[78,140],pros:['Next to Skyline Plaza, Chipotle number two','Farthest from Sculpture'],hint:''}
+];
+
+const PACK=[
+ {id:'socks',text:'Grip socks for Lagree'},
+ {id:'lagree',text:'Buy the 2-for-1 pack at Sculpture and book Tue 17:00 and Wed 10:00'},
+ {id:'hotel',text:'Book the Adina Westend for 13 to 15 Oct'},
+ {id:'groc',text:'Vegan and gluten-free breakfast groceries for the room kitchen'},
+ {id:'staedel',text:'Buy Städel tickets online for Thursday'},
+ {id:'transit',text:'Check how Simon gets to DFB Campus by 10:00'},
+ {id:'afrikas',text:'Reserve Im Herzen Afrikas for Wed 19:00 (+49 69 24246080)'},
+ {id:'cash',text:'Cash for dinner at Im Herzen Afrikas'},
+ {id:'ticket',text:'Get RMV day tickets (app or machine) for the S-Bahn to Sculpture'}
+];
+
+/* projection: lng 8.640..8.712 -> 0..360, lat 50.128..50.078 -> 0..389 */
+const proj=p=>p.xy||[(p.lng-8.640)*5000,(50.128-p.lat)*7776];
+function walkMin(a,b){
+  const k=Math.PI/180,dLat=(b.lat-a.lat)*k,dLng=(b.lng-a.lng)*k*Math.cos((a.lat+b.lat)/2*k);
+  return Math.max(1,Math.round(Math.sqrt(dLat*dLat+dLng*dLng)*6371000*1.3/78));
+}
+const P=id=>PLACES.find(x=>x.id===id);
+const KEYSPOTS=[['chip1','Chipotle'],['sculpture','Sculpture'],['staedel','Städel'],['mak','Ang. Kunst']];
+const fitScore=h=>walkMin(h,P('chip1'))+2*walkMin(h,P('sculpture'))+walkMin(h,P('staedel'))+walkMin(h,P('mak'));
+const bestFit=HOTELS.slice().sort((a,b)=>fitScore(a)-fitScore(b))[0].id;
+const walkGrid=h=>'<div class="walk">'+KEYSPOTS.map(([id,l])=>'<div><b>'+walkMin(h,P(id))+'′</b><span>'+l+'</span></div>').join('')+'</div>';
+
+const fresh=()=>({ver:DATA_VER,days:JSON.parse(JSON.stringify(DEFAULT_DAYS)),done:{},prices:{},chosen:'adina',pack:{},open:{},tab:'plan',pin:'sculpture',filter:'all',sort:'fit'});
+let state=fresh();
+try{const s=JSON.parse(localStorage.getItem(KEY)||'null');
+  if(s&&s.days){
+    if(s.ver!==DATA_VER){
+      const days=JSON.parse(JSON.stringify(DEFAULT_DAYS));
+      days.forEach(d=>{const old=s.days.find(o=>o.id===d.id);if(old)d.items.push(...old.items.filter(it=>it.user));});
+      s.days=days;s.pin='h-adina';s.chosen='adina';
+    }
+    state=Object.assign(state,s);
+  }
+}catch(e){}
+state.ver=DATA_VER;
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ICON={chk:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>',
+ chev:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s"><path d="M6 3.5L10.5 8 6 12.5"/></svg>'};
+
+function renderDays(){
+  const pills=document.getElementById('daypills');pills.innerHTML='';
+  const el=document.getElementById('days');el.innerHTML='';
+  state.days.forEach((d,di)=>{
+    d.items.sort((a,b)=>a.t.localeCompare(b.t));
+    const keys=d.items.map(it=>d.id+'|'+it.t+'|'+it.title);
+    const left=keys.filter(k=>!state.done[k]).length;
+    const p=document.createElement('button');p.className='pill'+(di===0?' on':'');p.type='button';
+    p.innerHTML='<b>'+esc(d.label)+'</b><small>'+left+' to go</small>';
+    p.onclick=()=>{pills.querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));p.classList.add('on');document.getElementById('day-'+d.id).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});};
+    pills.appendChild(p);
+
+    const [dow,num,mon]=d.label.split(' ');
+    const art=document.createElement('article');art.className='day c'+(di+1);art.id='day-'+d.id;
+    art.innerHTML='<div class="dhead"><h2>'+num+' '+mon+'</h2><div class="sub">'+dow+' · '+esc(d.title)+'</div></div>';
+    const ul=document.createElement('ul');ul.className='dlist';
+    d.items.forEach((it,i)=>{
+      const key=keys[i];const done=!!state.done[key];const open=!!state.open[key];
+      const li=document.createElement('li');li.className='it'+(done?' done':'')+(open?' open':'');
+      const tags=(it.tags||[]).filter(t=>t!=='Fixed').map(t=>'<span class="tag'+(t==='Must'?' solid':'')+'">'+esc(t)+'</span>').join('');
+      li.innerHTML='<div class="row"><button class="main" type="button" aria-expanded="'+open+'"><div class="tm">'+esc(it.t)+(it.fixed?'<span class="fixedbadge">Fixed</span>':'')+'</div><div class="tt">'+esc(it.title)+'</div></button>'+
+        '<button class="circ chev" type="button" aria-label="Details">'+ICON.chev+'</button><button class="circ ck" type="button" aria-label="Mark done">'+ICON.chk+'</button></div>'+
+        (open?'<div class="more">'+(it.note?'<div>'+(it.user?esc(it.note):it.note)+'</div>':'')+(tags?'<div class="tags">'+tags+'</div>':'')+(it.fixed?'':'<button class="rm" type="button">Remove from plan</button>')+'</div>':'');
+      const toggle=()=>{state.open[key]=!open;save();renderDays();};
+      li.querySelector('.main').onclick=toggle;li.querySelector('.chev').onclick=toggle;
+      li.querySelector('.ck').onclick=()=>{state.done[key]=!done;save();renderDays();};
+      const rm=li.querySelector('.rm');if(rm)rm.onclick=()=>{d.items.splice(i,1);save();renderDays();renderEat();};
+      ul.appendChild(li);
+    });
+    art.appendChild(ul);
+    const f=document.createElement('form');f.className='addf';
+    f.innerHTML='<input id="t-'+d.id+'" type="time" value="12:00" aria-label="Time"><input id="n-'+d.id+'" placeholder="Add a plan" aria-label="New plan"><button type="submit">Add</button>';
+    f.onsubmit=e=>{e.preventDefault();const n=f.querySelector('#n-'+d.id).value.trim();if(!n)return;d.items.push({t:f.querySelector('#t-'+d.id).value||'12:00',title:n,note:'',tags:[],user:true});save();renderDays();};
+    art.appendChild(f);el.appendChild(art);
+  });
+}
+
+const TIER={both:'Vegan + gluten free',gf:'Gluten-free kitchen, vegan dishes',vegan:'Fully vegan, ask about gluten',pick:'Your pick, order carefully'};
+function renderEat(){
+  const el=document.getElementById('eat');el.innerHTML='';
+  const groups=[['Safest bets',['both','gf']],['Fully vegan, ask about gluten',['vegan']],['Your picks',['pick']]];
+  groups.forEach(([title,tiers])=>{
+    const list=PLACES.filter(p=>p.cat==='food'&&tiers.includes(p.tier));
+    if(!list.length)return;
+    const h=document.createElement('div');h.className='sub-h';h.textContent=title;el.appendChild(h);
+    list.forEach(p=>{
+      const c=document.createElement('article');c.className='card eat';
+      const inDays=state.days.filter(d=>d.items.some(it=>it.placeId===p.id)).map(d=>d.id);
+      c.innerHTML='<div class="eh"><div><h3>'+esc(p.name)+'</h3><div class="kind">'+esc(p.kind)+'</div></div><span class="tier '+p.tier+'">'+esc(TIER[p.tier])+'</span></div>'+
+        '<div class="order">'+p.order+'</div>'+
+        '<div class="hint">'+esc(p.area)+(p.hours?' · '+esc(p.hours):'')+'</div>'+
+        (p.near?'<div class="hint">'+esc(p.near)+'</div>':'')+
+        (p.tier!=='pick'?'<div class="addday">Add as a lunch stop: '+state.days.map(d=>'<button type="button" data-d="'+d.id+'" class="'+(inDays.includes(d.id)?'added':'')+'">'+(inDays.includes(d.id)?'✓ ':'')+esc(d.label.split(' ')[0])+'</button>').join('')+'</div>':'')+
+        '<div class="btns"><button class="btn showmap" type="button">Show on map</button><a class="btn fill" href="'+(p.href||maps(p.q))+'" target="_blank" rel="noopener">'+(p.href?'Website':'Open in Maps')+'</a></div>';
+      c.querySelectorAll('.addday button').forEach(b=>b.onclick=()=>{
+        const d=state.days.find(x=>x.id===b.dataset.d);
+        const idx=d.items.findIndex(it=>it.placeId===p.id);
+        if(idx>=0)d.items.splice(idx,1);
+        else d.items.push({t:'13:00',title:p.name,note:p.area+(p.hours?'. '+p.hours:'')+'. '+p.text,tags:['Vegan + GF'],user:true,placeId:p.id});
+        save();renderEat();renderDays();
+      });
+      c.querySelector('.showmap').onclick=()=>{state.pin=p.id;state.filter='food';save();renderMap();setTab('map');};
+      el.appendChild(c);
+    });
+  });
+}
+
+function sortedHotels(){
+  const list=HOTELS.slice();
+  if(state.sort==='price'){
+    const pr=h=>{const v=parseFloat(state.prices[h.id]);return isNaN(v)||v<=0?Infinity:v;};
+    list.sort((a,b)=>pr(a)-pr(b)||fitScore(a)-fitScore(b));
+  }else list.sort((a,b)=>fitScore(a)-fitScore(b));
+  return list;
+}
+function priceChip(h){
+  const p=parseFloat(state.prices[h.id]);const has=!isNaN(p)&&p>0;
+  return !has?'<span class="chip none">Enter a price</span>':p<=140?'<span class="chip ok">Fits · €'+Math.round(p*2)+' for 2 nights</span>':'<span class="chip over">€'+Math.round(p-140)+' over budget</span>';
+}
+function renderHotels(){
+  const el=document.getElementById('hotels');el.innerHTML='';
+  document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('on',b.dataset.sort===state.sort));
+  sortedHotels().forEach((h,i)=>{
+    const p=parseFloat(state.prices[h.id]);const has=!isNaN(p)&&p>0;const ch=state.chosen===h.id;
+    const stars='★'.repeat(Math.floor(h.stars))+(h.stars%1?'½':'');
+    const vi=HOTELS.indexOf(h)%5;
+    const c=document.createElement('article');c.className='card hotel'+(ch?' chosen':'');
+    c.innerHTML='<div class="hband v'+vi+'"><span class="area">'+esc(h.area)+'</span><span class="st">'+stars+'</span></div>'+
+      (h.id===bestFit?'<span class="fit">Closest to your plans</span>':'')+
+      '<h3>'+esc(h.name)+'</h3>'+
+      '<div class="hint">Walking minutes to your plans</div>'+walkGrid(h)+
+      '<ul>'+h.pros.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+
+      '<div class="price"><label for="p-'+h.id+'">€ per night</label><input id="p-'+h.id+'" type="number" min="0" inputmode="decimal" value="'+(has?p:'')+'" placeholder="e.g. 125">'+priceChip(h)+'</div>'+
+      (h.hint?'<div class="hint">'+esc(h.hint)+'</div>':'')+
+      '<div class="btns"><button class="btn showmap" type="button">See on map</button><button class="btn fill pick" type="button">'+(ch?'Our hotel ✓':'Choose this')+'</button></div>'+
+      '<a class="hint" href="'+book(h.name)+'" target="_blank" rel="noopener" style="justify-self:center;font-weight:600">Check prices for 13 to 15 Oct</a>';
+    c.querySelector('input').onchange=e=>{state.prices[h.id]=e.target.value;save();renderHotels();renderMap();};
+    c.querySelector('.pick').onclick=()=>{state.chosen=ch?null:h.id;save();renderHotels();renderHeader();renderMap();};
+    c.querySelector('.showmap').onclick=()=>{state.pin='h-'+h.id;state.filter='all';save();renderMap();setTab('map');};
+    el.appendChild(c);
+  });
+}
+
+function allPins(){
+  return PLACES.map(p=>({...p,pid:p.id})).concat(HOTELS.map(h=>({...h,pid:'h-'+h.id,cat:'hotel',short:h.name.replace(/^The /,'').split(' ')[0]})));
+}
+const pinColor=p=>p.cat==='hotel'?'var(--lav)':p.cat==='meet'?'var(--fixed)':p.cat==='plan'||p.plan?'var(--olive)':'var(--orange)';
+function visible(p){
+  const f=state.filter;
+  if(f==='all')return true;
+  if(f==='plan')return p.cat==='plan'||p.cat==='meet'||!!p.plan||p.pid==='h-'+state.chosen;
+  if(f==='food')return p.cat==='food';
+  if(f==='hotel')return p.cat==='hotel'||p.cat==='plan';
+  return true;
+}
+function showLabel(p){
+  if(state.pin===p.pid)return true;
+  if(state.filter==='all')return p.cat==='plan'||p.cat==='meet'||!!p.plan||p.pid==='h-'+state.chosen;
+  return true;
+}
+function renderMap(){
+  document.querySelectorAll('#filters .pill').forEach(b=>b.classList.toggle('on',b.dataset.f===state.filter));
+  const g=document.getElementById('pins');g.innerHTML='';
+  const pins=allPins();
+  const ordered=pins.filter(p=>p.pid!==state.pin).concat(pins.filter(p=>p.pid===state.pin));
+  ordered.forEach(p=>{
+    const [x,y]=proj(p);const sel=state.pin===p.pid;const vis=visible(p);
+    const right=x<275;const isChosen=p.pid==='h-'+state.chosen;
+    const node=document.createElementNS('http://www.w3.org/2000/svg','g');
+    node.setAttribute('class','mk'+(sel?' sel':'')+(vis?'':' dim'));node.setAttribute('tabindex',vis?'0':'-1');node.setAttribute('role','button');node.setAttribute('aria-label',p.name);
+    const shape=p.cat==='hotel'
+      ?'<rect class="dot" x="'+(x-(sel?7:5.5))+'" y="'+(y-(sel?7:5.5))+'" width="'+(sel?14:11)+'" height="'+(sel?14:11)+'" rx="3" fill="'+(isChosen?'var(--forest)':pinColor(p))+'" stroke="var(--card)" stroke-width="2.2"/>'
+      :'<circle class="dot" cx="'+x+'" cy="'+y+'" r="'+(sel?8:6)+'" fill="'+pinColor(p)+'"/>';
+    node.innerHTML=shape+(vis&&showLabel(p)?'<text x="'+(right?x+10:x-10)+'" y="'+(y+3)+'" text-anchor="'+(right?'start':'end')+'">'+esc(isChosen?'Our hotel':p.short)+'</text>':'');
+    if(vis){const go=()=>{state.pin=p.pid;save();renderMap();};node.onclick=go;node.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};}
+    g.appendChild(node);
+  });
+  const p=pins.find(x=>x.pid===state.pin)||pins[0];
+  const pop=document.getElementById('pop');
+  const hotel=state.chosen&&HOTELS.find(h=>h.id===state.chosen);
+  if(p.cat==='hotel'){
+    const h=HOTELS.find(x=>'h-'+x.id===p.pid);const ch=state.chosen===h.id;
+    pop.innerHTML='<div class="meta">Hotel · '+esc(h.area)+' · '+'★'.repeat(Math.floor(h.stars))+(h.stars%1?'½':'')+'</div><h3>'+esc(h.name)+'</h3>'+(h.id===bestFit?'<span class="fit">Closest to your plans</span>':'')+walkGrid(h)+'<div class="price">'+priceChip(h)+'</div>'+
+      '<div class="btns"><a class="btn" href="'+book(h.name)+'" target="_blank" rel="noopener">Check dates</a><button class="btn fill" type="button" id="popPick">'+(ch?'Our hotel ✓':'Choose this')+'</button></div>';
+    document.getElementById('popPick').onclick=()=>{state.chosen=ch?null:h.id;save();renderMap();renderHotels();renderHeader();};
+  }else{
+    const fromHotel=hotel&&p.cat!=='meet'?'<div class="hint">'+walkMin(hotel,p)+' min walk from '+esc(hotel.name)+'</div>':'';
+    pop.innerHTML='<div class="meta">'+esc(p.meta)+'</div><h3>'+esc(p.name)+'</h3><div>'+esc(p.text)+'</div>'+fromHotel+
+      '<div class="btns"><button class="btn" type="button" id="nextPin">Next place</button><a class="btn fill" href="'+(p.href||maps(p.q))+'" target="_blank" rel="noopener">Open in Maps</a></div>';
+    document.getElementById('nextPin').onclick=()=>{const vis=pins.filter(visible);const i=vis.findIndex(x=>x.pid===p.pid);state.pin=vis[(i+1)%vis.length].pid;save();renderMap();};
+  }
+}
+document.querySelectorAll('#filters .pill').forEach(b=>b.onclick=()=>{state.filter=b.dataset.f;
+  const pins=allPins();const cur=pins.find(x=>x.pid===state.pin);
+  if(!cur||!visible(cur)){const first=pins.find(visible);if(first)state.pin=first.pid;}
+  save();renderMap();});
+document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{state.sort=b.dataset.sort;save();renderHotels();});
+
+function renderPack(){
+  const el=document.getElementById('pack');el.innerHTML='';
+  const upd=()=>{const n=PACK.filter(x=>state.pack[x.id]).length;document.getElementById('packcount').textContent=n+' of '+PACK.length+' done';};
+  PACK.forEach(p=>{const li=document.createElement('li');
+    li.innerHTML='<label><input type="checkbox" id="pk-'+p.id+'"'+(state.pack[p.id]?' checked':'')+'><span>'+esc(p.text)+'</span></label>';
+    li.querySelector('input').onchange=e=>{state.pack[p.id]=e.target.checked;save();upd();};el.appendChild(li);});
+  upd();
+}
+
+function renderHeader(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const diff=Math.round((new Date(2026,9,13)-today)/864e5);
+  const h=HOTELS.find(x=>x.id===state.chosen);
+  document.getElementById('today').textContent=diff>1?diff+' days to go':diff===1?'Tomorrow!':diff>-3?"You're in Frankfurt":'Trip complete';
+  document.getElementById('sub').textContent=h?'Staying at '+h.name+'. Two nights, one very important burrito bowl.':'Two nights, three days, one very important burrito bowl. Hotel still to pick.';
+}
+
+function setTab(t){
+  state.tab=t;save();
+  document.querySelectorAll('.tabp').forEach(s=>{s.hidden=s.id!=='tab-'+t;});
+  document.querySelectorAll('.nav button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===t)));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+document.getElementById('toPlan').onclick=()=>setTab('plan');
+document.getElementById('toMap').onclick=()=>setTab('map');
+let armed=false;
+document.getElementById('reset').onclick=e=>{
+  if(!armed){armed=true;e.target.textContent='Tap again to reset';setTimeout(()=>{armed=false;e.target.textContent='Reset the plan';},3000);return;}
+  const tab=state.tab;state=fresh();state.tab=tab;save();renderAll();armed=false;e.target.textContent='Reset the plan';
+  document.getElementById('resetMsg').textContent='Plan reset to the original.';
+};
+function renderAll(){renderDays();renderEat();renderHotels();renderMap();renderPack();renderHeader();setTab(state.tab||'plan');}
+renderAll();
+</script>
+
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+</script>
+</body>
+</html>
