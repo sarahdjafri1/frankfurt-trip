@@ -1,7 +1,8 @@
-const CACHE='ffm-trip-v1';
-const CORE=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png'];
+const CACHE='ffm-trip-v2';
+const TILES='ffm-tiles-v1';
+const CORE=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','leaflet/leaflet.js','leaflet/leaflet.css'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE&&k!==TILES).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',e=>{
   const req=e.request; if(req.method!=='GET')return;
   const url=new URL(req.url);
@@ -11,9 +12,11 @@ self.addEventListener('fetch',e=>{
     e.respondWith(fetch(req).then(r=>{const cp=r.clone();caches.open(CACHE).then(c=>c.put('index.html',cp));return r;}).catch(()=>caches.match('index.html')));
     return;
   }
-  // cache first for icons and Google Fonts
+  const isTile=url.hostname.endsWith('basemaps.cartocdn.com');
+  const bucket=isTile?TILES:CACHE;
+  // cache first for map tiles, the map library, icons and fonts
   e.respondWith(caches.match(req).then(hit=>hit||fetch(req).then(r=>{
-    if(r.ok||r.type==='opaque'){const cp=r.clone();caches.open(CACHE).then(c=>c.put(req,cp));}
+    if(r.ok||r.type==='opaque'){const cp=r.clone();caches.open(bucket).then(c=>c.put(req,cp));}
     return r;
   })));
 });
