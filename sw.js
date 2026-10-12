@@ -1,4 +1,4 @@
-const CACHE='ffm-trip-v4';
+const CACHE='ffm-trip-v5';
 const TILES='ffm-tiles-v2';
 const CORE=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','leaflet/leaflet.js','leaflet/leaflet.css'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
@@ -9,7 +9,7 @@ self.addEventListener('fetch',e=>{
   const isPage=req.mode==='navigate'||url.pathname.endsWith('index.html');
   if(isPage){
     // network first so plan updates show up, cache as offline fallback
-    e.respondWith(fetch(req).then(r=>{const cp=r.clone();caches.open(CACHE).then(c=>c.put('index.html',cp));return r;}).catch(()=>caches.match('index.html')));
+    e.respondWith(fetch(req.url,{cache:'no-cache'}).then(r=>{const cp=r.clone();caches.open(CACHE).then(c=>c.put('index.html',cp));return r;}).catch(()=>caches.match('index.html')));
     return;
   }
   const isTile=url.hostname.endsWith('tile.openstreetmap.org');
